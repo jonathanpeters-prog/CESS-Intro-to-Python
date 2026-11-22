@@ -29,16 +29,21 @@ info = turtle.Turtle()
 info.hideturtle()
 info.penup()
 
-jonathan = 202553080025
+
 
 
 # ===== Game settings =====
-word = "console"   # task #1: insert your own word (any word you want)
+word = "rabbit"   # task #1: insert your own word (any word you want)
 guessed = ""
 wrong = 0
 won = False
+attemptLimit = len(set(word)) + 6
+myAttempt = 0
+sameLetter = False
+letterEmpty = False
 
-while wrong < 6 and not won:     # task #2: how many attempts should be?🤔
+for attempt in range(attemptLimit+1):     # task #2: how many attempts should be?🤔
+    
     # --- 1. showing word or mistakes number ---
     display = ""
     for letter in word:
@@ -48,27 +53,43 @@ while wrong < 6 and not won:     # task #2: how many attempts should be?🤔
             display += "_ "
 
     info.clear()
+    if(sameLetter):
+        info.goto(-300, -305)
+        info.write("You've already entered this letter!", font=("Arial", 12, "italic"))
+    if(letterEmpty):
+            info.goto(-300, -305)
+            info.write("Your Input must not be empty!", font=("Arial", 12, "italic"))
     info.goto(-300, -200)
     info.write("Word: " + display, font=("Arial", 18, "normal"))
     info.goto(-300, -235)
     info.write("Mistakes: " + str(wrong) + " / 6", font=("Arial", 14, "normal"))
-
+    info.goto(-300, -270)
+    info.write("Your Attempt: " + str(myAttempt) + " / " + str(attemptLimit), font=("Arial", 14, "normal"))
     screen.update()        # ← showing all before the second word enter
-
+    if won:
+        break
+    if(wrong >= 6 or myAttempt > attemptLimit):
+        won = False
+        break
     # --- 2. word enter ---
     letter = screen.textinput("Gallow", "Your letter:")
-    if letter is None:
+    letterEmpty = False
+    if letter == "":
         letter = ""
+        letterEmpty = True
     letter = letter.strip().lower()
-
-    # --- 3. cehcking ---
-    if letter in guessed:
-        info.goto(-300, -270)
-        info.write("You've already entered this letter!", font=("Arial", 12, "italic"))
+    myAttempt+=1
+    # --- 3. checking ---
+    if (letter in guessed and letter != ""):
+        sameLetter = True
+        
     elif letter in word:
+        sameLetter = False
         guessed += letter
     else:
+        sameLetter = False
         wrong += 1
+        guessed+=letter
         # drawing new part of body
         pen.penup()
         if wrong == 1:                    # head
@@ -97,6 +118,8 @@ while wrong < 6 and not won:     # task #2: how many attempts should be?🤔
             pen.pendown()
             pen.goto(100, 10)
 
+    
+
     # --- 4. checking the win ---
     win = True
     for letter in word:
@@ -104,10 +127,9 @@ while wrong < 6 and not won:     # task #2: how many attempts should be?🤔
             win = False
     if win:
         won = True
-        break
 
 # ===== Final =====
-info.goto(-300, -305)
+info.goto(-300, -335)
 if won:
     info.write("Winner winner chicken dinner! Word is: " + word, font=("Arial", 18, "bold"))
 else:
